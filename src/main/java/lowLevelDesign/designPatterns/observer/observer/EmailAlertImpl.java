@@ -9,7 +9,7 @@ public class EmailAlertImpl implements NotificationAlertObserver {
 
     public EmailAlertImpl(String email, ProductObservable productObservable) {
         this.email = email;
-        // product observable can be used to get infon regarding stock count and etc
+        // product observable can be used to get info regarding stock count and etc
         this.productObservable = productObservable;
     }
 
