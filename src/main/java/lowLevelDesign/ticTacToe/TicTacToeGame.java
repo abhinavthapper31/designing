@@ -69,5 +69,6 @@ public class TicTacToeGame {
     }
 
     private boolean checkForWinner(int row, int column, PlayingPiece playingPiece) {
+        return true;
     }
 }
