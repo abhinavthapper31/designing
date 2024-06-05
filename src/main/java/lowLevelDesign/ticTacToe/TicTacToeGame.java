@@ -48,6 +48,7 @@ public class TicTacToeGame {
 
             if (!pieceAdditionSuccessful) {
                 System.out.println("Incorrect position. Chose again");
+                // so player can choose again
                 players.addFirst(player);
                 continue;
             }
@@ -58,17 +59,49 @@ public class TicTacToeGame {
             boolean winner = checkForWinner(row, column, player.getPlayingPiece());
 
             if (winner) {
+                board.printBoard();
                 System.out.println("Player " + player.getName() + " won the game");
                 return;
             }
-
-
         }
         System.out.println("Tied");
 
     }
 
     private boolean checkForWinner(int row, int column, PlayingPiece playingPiece) {
-        return true;
+
+        // vertical check
+        boolean rowMatch = true;
+        boolean colMatch = true;
+        boolean diagonalMatch = true;
+        boolean diagonalMatch2 = true;
+
+
+        for (int i = 0; i < board.getSize(); i++) {
+            if (board.getBoard()[i][column] == null || board.getBoard()[i][column] != playingPiece) {
+                colMatch = false;
+            }
+        }
+
+        for (int i = 0; i < board.getSize(); i++) {
+            if (board.getBoard()[row][i] == null || board.getBoard()[row][i] != playingPiece) {
+                rowMatch = false;
+            }
+        }
+
+        for (int i = 0, j = 0; i < board.getSize() && j < board.getSize(); i++, j++) {
+            if (board.getBoard()[i][j] == null || board.getBoard()[i][j] != playingPiece) {
+                diagonalMatch = false;
+            }
+        }
+
+        for (int i = 0, j = board.getSize() - 1; i < board.getSize() && j >= 0; i++, j--) {
+            if (board.getBoard()[i][j] == null || board.getBoard()[i][j] != playingPiece) {
+                diagonalMatch2 = false;
+            }
+        }
+
+
+        return rowMatch || colMatch || diagonalMatch || diagonalMatch2;
     }
 }
