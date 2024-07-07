@@ -1,4 +1,4 @@
-package lowLevelDesign.loggingSystem;
+package lowLevelDesign.designPatterns.loggingSystem;
 
 public class ErrorLogProcessor extends LogProcessor {
     ErrorLogProcessor(LogProcessor nextLogProcessor) {
