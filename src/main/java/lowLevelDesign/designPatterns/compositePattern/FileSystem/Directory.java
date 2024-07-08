@@ -1,4 +1,4 @@
-package lowLevelDesign.designPatterns.compositePattern;
+package lowLevelDesign.designPatterns.compositePattern.FileSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,6 @@ public class Directory implements FileSystem {
     public void add(FileSystem fileSystemObj) {
         objectList.add(fileSystemObj);
     }
-
 
     public String getDirectoryName() {
         return directoryName;

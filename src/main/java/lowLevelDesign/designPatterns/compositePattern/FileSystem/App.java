@@ -1,10 +1,10 @@
-package lowLevelDesign.designPatterns.compositePattern;
+package lowLevelDesign.designPatterns.compositePattern.FileSystem;
 
 public class App {
 
     /*
      * COMPOSITE DESGIN PATTERN
-     * Object within an object or when a hierarchy (tree) is created.
+     * Object within an object or when a hierarchy (or tree) is created.
      *
      * */
     public static void main(String[] args) {
