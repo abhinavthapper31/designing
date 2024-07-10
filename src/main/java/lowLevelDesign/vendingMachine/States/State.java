@@ -6,6 +6,7 @@ import lowLevelDesign.vendingMachine.VendingMachine;
 
 import java.util.List;
 
+// use abstract class for state
 public interface State {
     // this will have all the possible operations
 
