@@ -1,4 +1,4 @@
-package lowLevelDesign.designPatterns.command.CopypPaste;
+package lowLevelDesign.designPatterns.command.CopyPaste;
 
 
 public class PasteCommand implements Command {

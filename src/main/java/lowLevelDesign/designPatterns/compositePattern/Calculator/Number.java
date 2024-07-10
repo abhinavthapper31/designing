@@ -10,7 +10,6 @@ public class Number implements Expression {
 
     @Override
     public int evaluate() {
-
         return this.value;
     }
 }

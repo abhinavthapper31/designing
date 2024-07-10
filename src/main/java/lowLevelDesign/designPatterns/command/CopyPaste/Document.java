@@ -1,7 +1,7 @@
-package lowLevelDesign.designPatterns.command.CopypPaste;
+package lowLevelDesign.designPatterns.command.CopyPaste;
 
 public class Document {
-    String copiedValue;
+    String lastCopiedValue;
     String text;
 
     public Document(String text) {
@@ -9,11 +9,11 @@ public class Document {
     }
 
     void copyValue(int start, int end) {
-        copiedValue = text.substring(start, end);
+        lastCopiedValue = text.substring(start, end);
         System.out.println("Copies text : " + text.substring(start, end));
     }
 
     public void pasteValue() {
-        System.out.println("Pasted last copied value " + this.copiedValue);
+        System.out.println("Pasted last copied value " + this.lastCopiedValue);
     }
 }

@@ -2,6 +2,11 @@ package lowLevelDesign.designPatterns.compositePattern.Calculator;
 
 public class App {
 
+    /*
+     * COMPOSITE DESGIN PATTERN
+     * Object within an object or when a hierarchy (or tree) is created.
+     *
+     * */
     public static void main(String[] args) {
 
         Number num1 = new Number(5);
@@ -15,7 +20,7 @@ public class App {
 
         Expression finalExp = new ArithmeticExpression(exp1, Operation.MULTIPLY, exp2);
 
-       System.out.println(finalExp.evaluate()) ;
+        System.out.println(finalExp.evaluate());
 
 
     }
