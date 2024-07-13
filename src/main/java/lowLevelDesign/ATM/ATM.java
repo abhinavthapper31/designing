@@ -60,7 +60,7 @@ public class ATM {
 
     public boolean authenticateCardPin(Card card, int pin) {
         // call card auth class.
-        return false;
+        return card.authenticatepin(pin);
     }
 
     public void printCurrentATMStatus() {
@@ -82,5 +82,9 @@ public class ATM {
 
     public void deductFiveHundredNotes(int consumedNotes) {
         this.fiveHundredNotes = this.fiveHundredNotes - consumedNotes;
+    }
+
+    public void updateBalance() {
+        this.atmBalance = twoThousandNotes * 2000 + fiveHundredNotes * 500 + oneHundredNotes * 100;
     }
 }

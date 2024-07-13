@@ -24,7 +24,6 @@ public class SelectOperationState extends State {
                 returnCard();
                 exit(atm);
         }
-
     }
 
 

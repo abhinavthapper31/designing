@@ -2,6 +2,7 @@ package lowLevelDesign.ATM.states;
 
 import lowLevelDesign.ATM.ATM;
 import lowLevelDesign.ATM.Card;
+import lowLevelDesign.ATM.enums.ATMOperations;
 
 public abstract class State {
 
@@ -13,7 +14,7 @@ public abstract class State {
         System.out.println("Invalid operation ! Can not enter pin in this state.");
     }
 
-    public void selectATMOpertaion(ATM atm, Card card) {
+    public void selectATMOpertaion(ATM atm, Card card, ATMOperations operation) {
         System.out.println("Invalid operation ! ");
     }
 
@@ -32,6 +33,8 @@ public abstract class State {
     public void exit(ATM atm) {
         System.out.println("OOPS!! Something went wrong");
     }
-
+    public void showSupportedOperations(){
+        System.out.println("OOPS!! Something went wrong");
+    }
 
 }

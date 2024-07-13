@@ -2,33 +2,32 @@ package lowLevelDesign.ATM.Processor;
 
 import lowLevelDesign.ATM.ATM;
 
-public class TwoThousandNotesProcessor extends WithdrawlProcessor {
+public class FiveHundredNotesProcessor extends WithdrawlProcessor {
 
-    public TwoThousandNotesProcessor(WithdrawlProcessor nextProcessor) {
+    public FiveHundredNotesProcessor(WithdrawlProcessor nextProcessor) {
         super(nextProcessor);
     }
 
     @Override
     public void withdraw(ATM atm, int remainingAmount) {
-        // logic for withdrawing 2000
+        // logic for withdrawing 500
 
-        int consumedNotes = remainingAmount / 2000;
-        int remainingBalance = remainingAmount % 2000;
+        int consumedNotes = remainingAmount / 500;
+        int remainingBalance = remainingAmount % 500;
 
         if (consumedNotes <= atm.getTwoThousandNotes()) {
             atm.deductTwoThousandNotes(consumedNotes);
         } else if (consumedNotes > atm.getTwoThousandNotes()) {
             // deduct all
             atm.deductTwoThousandNotes(atm.getTwoThousandNotes());
-            remainingBalance = remainingBalance + (consumedNotes - atm.getTwoThousandNotes()) * 2000;
+            remainingBalance = remainingBalance + (consumedNotes - atm.getFiveHundredNotes()) * 500;
         }
 
         System.out.println("Withdrew : " + + consumedNotes);
         System.out.println("Remaining : " + + remainingBalance);
 
-
         if (remainingBalance != 0) {
-            super.withdraw(atm, remainingBalance);
+            System.out.println("Error !");
         }
     }
 }
