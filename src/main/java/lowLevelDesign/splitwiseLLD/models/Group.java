@@ -11,7 +11,7 @@ public class Group {
     private String groupName;
     private List<User> members;
     private List<Expense> expenseList;
-    ExpenseManager expenseManager;
+    private ExpenseManager expenseManager;
 
 
     public Group() {
@@ -50,7 +50,7 @@ public class Group {
     }
 
     // an expense is created on group
-    Expense createExpense(Integer expenseId, Integer description, int amount, User paidBy, SplitType splitType, List<Split> splitDetails) {
+    Expense createExpense(Integer expenseId, String description, int amount, User paidBy, SplitType splitType, List<Split> splitDetails) {
         Expense expense = expenseManager.createExpense(expenseId, description, amount, splitDetails, splitType, paidBy);
         expenseList.add(expense);
         return expense;
