@@ -32,8 +32,8 @@ public class GymBagObservable implements ProductObservable {
 
     @Override
     public void notifyObservers() {
-        for (NotificationAlertObserver o : notificationAlertObservers) {
-            o.update();
+        for (NotificationAlertObserver observer : notificationAlertObservers) {
+            observer.update();
         }
     }
 

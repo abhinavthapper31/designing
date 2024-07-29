@@ -10,15 +10,15 @@ public class TokenBucketRateLimiter implements RateLimiter {
     long refillInterval;
     int refillRate;
 
-    TokenBucketRateLimiter() {
-        tokenPerBucket = 5;
+    TokenBucketRateLimiter(int tokenPerBucket) {
+        this.tokenPerBucket = tokenPerBucket;
         this.refillInterval = 1000 * 6l;
         refillRate = 1;
     }
 
 
     @Override
-    public boolean isRequestAllow(String key, Request request) {
+    public boolean isRequestAllowed(String key, Request request) {
         TokenBucket bucket = map.get(key);
         if (bucket == null) {
             TokenBucket newBucket = new TokenBucket(tokenPerBucket - 1);

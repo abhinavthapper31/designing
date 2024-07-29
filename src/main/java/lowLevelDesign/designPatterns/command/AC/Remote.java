@@ -11,6 +11,4 @@ public class Remote {
     void pressButton() {
         command.execute();
     }
-
-
 }

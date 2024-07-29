@@ -1,5 +1,5 @@
 package lowLevelDesign.rateLimiter;
 
 public interface RateLimiter {
-    boolean isRequestAllow(String key,Request req);
+    boolean isRequestAllowed(String key, Request req);
 }

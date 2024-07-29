@@ -15,6 +15,7 @@ public class File implements FileSystem {
         this.fileName = fileName;
     }
 
+    @Override
     public void ls() {
         System.out.println(this.fileName + " ");
     }

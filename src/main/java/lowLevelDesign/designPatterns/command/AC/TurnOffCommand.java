@@ -12,7 +12,7 @@ public class TurnOffCommand implements Command {
     @Override
     public void execute() {
         ac.turnOff();
-        System.out.println("turn off command excecuted");
+        System.out.println("turn off command executed");
 
     }
 

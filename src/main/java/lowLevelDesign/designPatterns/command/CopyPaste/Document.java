@@ -10,7 +10,7 @@ public class Document {
 
     void copyValue(int start, int end) {
         lastCopiedValue = text.substring(start, end);
-        System.out.println("Copies text : " + text.substring(start, end));
+        System.out.println("Copied text : " + text.substring(start, end));
     }
 
     public void pasteValue() {

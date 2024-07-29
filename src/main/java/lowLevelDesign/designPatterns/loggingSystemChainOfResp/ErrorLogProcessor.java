@@ -1,4 +1,4 @@
-package lowLevelDesign.designPatterns.loggingSystem;
+package lowLevelDesign.designPatterns.loggingSystemChainOfResp;
 
 public class ErrorLogProcessor extends LogProcessor {
     ErrorLogProcessor(LogProcessor nextLogProcessor) {

@@ -19,7 +19,7 @@ public class LeakyBucketRateLimiter implements RateLimiter {
     }
 
     @Override
-    public boolean isRequestAllow(String key, Request request) {
+    public boolean isRequestAllowed(String key, Request request) {
         BlockingQueue<Request> queue = map.get(key);
         if (queue == null) {
             queue = new LinkedBlockingQueue<Request>(capacity);

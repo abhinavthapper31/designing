@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-class Pair{
+class Pair {
     int x;
 }
 
 public class Test {
+
 
     public static void main(String[] args) {
 

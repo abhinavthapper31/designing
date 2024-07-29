@@ -1,4 +1,4 @@
-package lowLevelDesign.designPatterns.loggingSystem;
+package lowLevelDesign.designPatterns.loggingSystemChainOfResp;
 
 public abstract class LogProcessor {
 
