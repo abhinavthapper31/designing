@@ -1,0 +1,102 @@
+
+
+Problem example :
+Imagine a book my show like APP. Multiple users trying to book a resource (SEAT) concurrently.
+This will cause race condition. and inconsistencies.
+
+SOL1 : used synchronized key word (will work for a single serve but not in distributed env)
+multiple machines could be accessing same resource.
+
+
+SOL2 : Distributed Concurrency Control :
+two ways optimistic concurrency control and pessimistic concurrency control.
+
+TRANSACTIONS :
+A transaction is the smallest unit of work. Helps us achieve integrity of data and avoid inconsistency.
+
+Eg
+
+BEGIN Transaction
+
+A.balance = A.balance - 100 ;
+B.balance = B.balance + 100 ;
+
+if(both success) : COMMIT ELSE ROLLBACK (roll back will revert successful transactions also)
+
+END Transaction
+
+LOCKING (Row level) :
+Use : If a thread is accessing a row, no other transaction/thread can WRITE/UPDATE on it
+
+Two types of locks :
+Shared locks (S) - Read lock, other thread can take another shared lock but can not take Exclusive lock.
+
+Exclusive lock (x) - Can not take either shared lock or another exclusive lock.
+
+
+ISOLATION LEVELS :
+(This defines the level of concurrency)
+
+4 LEVEL :
+
+Problems : Dirty Read, Non Repeatable read, Phantom read
+
+Dirty Read
+What it is:
+
+A dirty read happens when a transaction reads data that has been modified by another transaction but not yet committed.
+Example:
+
+Imagine you’re reading a draft of a friend’s essay. Your friend is still editing it. You read a paragraph that says,
+“The cat is green.” But then your friend decides to change it to “The cat is black.” You read “The cat is green,” which
+ is not the final version. This is a dirty read.
+Non-Repeatable Read
+What it is:
+
+A non-repeatable read occurs when a transaction reads the same row twice and gets different data each time because another
+ transaction modified the row and committed the change in between the two reads.
+Example:
+
+You’re reading the essay again. You read, “The cat is black.” You look away for a moment, and in the meantime, your friend
+changes it to “The cat is brown” and saves it. You look back and read the same paragraph again, but now it says, “The cat
+is brown.” You saw two different versions of the same paragraph. This is a non-repeatable read.
+Phantom Read
+What it is:
+
+A phantom read occurs when a transaction reads a set of rows that meet a certain condition, and another transaction inserts
+ or deletes rows that meet the same condition, causing the original transaction to get a different set of rows if it re-reads
+ the condition.
+Example:
+
+You’re reviewing a list of all paragraphs in the essay that mention “the cat.” You find three paragraphs: “The cat is black,”
+ “The cat is brown,” and “The cat is quick.” While you’re re-reading the list, your friend adds another paragraph: “The cat is
+ .” Now, when you look again, you find four paragraphs instead of three. The new paragraph is a phantom read.
+
+
+READ_UNCOMMITED
+    - all three can happen,
+    - weakest consistency but high concurrency
+    - No locks used at all neither shared/exclusive
+
+
+READ_COMMITED
+    - prevents Dirty Read only
+    - Shared lock taken for each read and released when the read is done
+    - for write there is an exclusive lock (released @ end of transaction)
+    - will prevent dirty reads by virtue of the X locks which will disallow reads to end of the write process.
+      if X lock is there even the S lock can not be taken, so dirty read not possible
+    - Non repeatable read prob is still there
+
+REPEATABLE READ (prevents Dirty Read and Non Repeatable read only)
+    - Shared lock taken for each read and released when the transaction ends.
+    - Prevents non repeatable read as X lock can not be taken as  S lock is taken for the whole of the transaction
+    - phantom read can be there.
+
+SERIALIZABLE (Prevents all,weakest concurrency but high consistency)
+    - same locking mech as REPEATABLE READ  + Range lock
+    - Range lock is a lock on all the rows. So nothing can be done. No insertion.
+    - Locking nearby ranges also.
+
+OPTIMISTIC CONCURRENCY CONTROL :
+
+

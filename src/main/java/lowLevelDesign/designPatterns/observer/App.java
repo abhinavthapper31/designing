@@ -12,13 +12,13 @@ public class App {
         // when the state of Observable changes, we notify all the subscribed Observers.
 
         ProductObservable gymBagObservable = new GymBagObservable();
-        gymBagObservable.addObserver(new EmailAlertImpl("abc@gmai.com",gymBagObservable));
-        gymBagObservable.addObserver(new EmailAlertImpl("xzzzxzz@gmai.com",gymBagObservable));
-        gymBagObservable.addObserver(new EmailAlertImpl("jsadhgfdsa@gmai.com",gymBagObservable));
-
-
-        gymBagObservable.addObserver(new SMSAlertImpl("98u23143124",gymBagObservable));
-        gymBagObservable.addObserver(new SMSAlertImpl("98734213",gymBagObservable));
+//        gymBagObservable.addObserver(new EmailAlertImpl("abc@gmail .com",gymBagObservable));
+//        gymBagObservable.addObserver(new EmailAlertImpl("xzzzxzz@gmai.com",gymBagObservable));
+//        gymBagObservable.addObserver(new EmailAlertImpl("jsadhgfdsa@gmai.com",gymBagObservable));
+//
+//
+//        gymBagObservable.addObserver(new SMSAlertImpl("98u23143124",gymBagObservable));
+//        gymBagObservable.addObserver(new SMSAlertImpl("98734213",gymBagObservable));
 
         gymBagObservable.updateStockCount(100);
     }

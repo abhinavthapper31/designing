@@ -27,7 +27,7 @@ public class MyHashMap<K, V> {
 
     public class Node<K, V> {
 
-        private K key;
+        private  K key;
         private V value;
         private Node next;
 

@@ -1,4 +1,4 @@
-package lowLevelDesign.circuitBreakerLibraray;
+package lowLevelDesign.circuitBreakerLibrary;
 
 public class SimpleCircuitBreaker {
     private State state = State.CLOSED;
@@ -39,7 +39,7 @@ public class SimpleCircuitBreaker {
                 reset();
                 return result;
             } catch (Exception e) {
-                System.out.println("Exeception occured ! Retrying");
+                System.out.println("Exception occurred ! Retrying");
                 retries++;
                 if (retries >= maxRetries) {
                     failureCount++;

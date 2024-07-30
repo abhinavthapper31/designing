@@ -21,7 +21,7 @@ public class Cache<Key, Value> {
             if (storage.isFull()) {
                 Key evictedKey = evictionPolicy.evict();
                 storage.remove(evictedKey);
-                System.out.println("Key got evicted ! Key is " + evictedKey);
+                System.out.println("Key evicted ! Key is " + evictedKey);
             }
             storage.put(key, value);
             evictionPolicy.keyAccessed(key);

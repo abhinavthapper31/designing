@@ -1,4 +1,4 @@
-package lowLevelDesign.circuitBreakerLibraray;
+package lowLevelDesign.circuitBreakerLibrary;
 
 public class SuccessOperation implements Operation {
     @Override
