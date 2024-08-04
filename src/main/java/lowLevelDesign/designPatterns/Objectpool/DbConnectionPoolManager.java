@@ -3,6 +3,8 @@ package lowLevelDesign.designPatterns.Objectpool;
 import java.util.ArrayList;
 import java.util.List;
 
+// Must be Singleton always and
+// the get and release methods should be synced.
 public class DbConnectionPoolManager {
 
     private List<DbConnection> freeConnectionPool;
