@@ -7,11 +7,9 @@ import java.util.List;
 
 public class SMSAlertImpl implements NotificationAlertObserver {
     private List<String> phoneNumber;
-    private ProductObservable productObservable;
 
-    public SMSAlertImpl(List<String> phoneNumber, ProductObservable productObservable) {
+    public SMSAlertImpl(List<String> phoneNumber) {
         this.phoneNumber = phoneNumber;
-        this.productObservable = productObservable;
     }
 
     @Override

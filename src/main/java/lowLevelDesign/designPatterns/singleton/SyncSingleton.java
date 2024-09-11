@@ -1,6 +1,5 @@
 package lowLevelDesign.designPatterns.singleton;
 
-//https://www.geeksforgeeks.org/singleton-design-pattern/
 public class SyncSingleton {
 	// the attribute is the only instance which will be created
 	// volatile so as objects read directly from memory

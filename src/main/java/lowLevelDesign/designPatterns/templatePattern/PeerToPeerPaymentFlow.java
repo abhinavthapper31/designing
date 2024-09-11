@@ -20,4 +20,9 @@ public class PeerToPeerPaymentFlow extends PaymentFlow {
     public void creditAmount() {
 
     }
+
+    @Override
+    public void generateBill() {
+
+    }
 }

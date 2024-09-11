@@ -10,6 +10,8 @@ public abstract class PaymentFlow {
 
     public abstract void creditAmount();
 
+    public abstract void generateBill();
+
     public void makePayment() {
 
         // to make payment all classes have to call this common makePayment fn this will make them follow same
@@ -22,6 +24,8 @@ public abstract class PaymentFlow {
         debitAmount();
 
         creditAmount();
+
+        generateBill();
     }
 
 }

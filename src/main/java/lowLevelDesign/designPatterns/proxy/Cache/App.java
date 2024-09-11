@@ -2,6 +2,12 @@ package lowLevelDesign.designPatterns.proxy.Cache;
 
 public class App {
 
+    /*
+    * When we want to provide controlled access of a functionality to someone else
+    *
+    *
+    *
+    * */
     public static void main(String[] args) {
         IDatabaseAccess access = new DatabaseAccessProxy();
 

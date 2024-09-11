@@ -7,12 +7,9 @@ import java.util.List;
 public class EmailAlertImpl implements NotificationAlertObserver {
 
     private List<String> email;
-    private ProductObservable productObservable;
 
-    public EmailAlertImpl(List<String> email, ProductObservable productObservable) {
+    public EmailAlertImpl(List<String> email) {
         this.email = email;
-        // product observable can be used to get info regarding stock count and etc
-        this.productObservable = productObservable;
     }
 
     @Override

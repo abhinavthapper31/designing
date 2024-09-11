@@ -22,8 +22,6 @@ public class Student implements Prototype {
 
     @Override
     public Prototype clone() {
-        Student clone = new Student(this.id, this.name, this.height);
-        return clone;
-
+        return new Student(this.id, this.name, this.height);
     }
 }
