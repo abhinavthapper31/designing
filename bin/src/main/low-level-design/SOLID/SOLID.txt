@@ -1,0 +1,184 @@
+
+
+S - Single Responsibilty - Each class should have single responsibilty AND  only one reason to change.
+
+class Marker{
+	
+	String name; 
+	String color;
+	int price
+	
+	Marker() {
+	}
+	..... other fields
+}
+
+
+class Invoice{
+	Marker marker ; 
+	int quantity; 
+	
+	Invoice(){
+	}
+	
+	public int calculateTotalBill{
+		this.marker.price * this.quantity
+	}
+	
+	public void printInvoice(){
+		// prints
+	}
+	
+	public void saveToDB(){
+		// saves
+	}
+	
+
+}
+
+Above Invoice class has multiple reasons to change (calculateTotalBill(), printInvoice(),saveToDB() ), it does not follow Single-Resp Principle.
+We should create separate classes for printInvoice() and saveToDB()
+
+
+InvoiceDao{
+	Invoice invoice ;
+	
+	// constructors and other fields
+	
+	public void saveToDB(){
+		// saves
+	}
+	
+	public void saveToFile(){
+		// saves
+	}
+}
+
+
+InvoicePrinter{
+	Invoice invoice ;
+	
+	// constructors and other fields
+	
+	public void printInvoice(){
+		// prints
+	}
+	
+	public void printInvoiceWithDiscount(){
+		// prints
+	}
+}
+
+
+O - Open Close Principle - Open for extention but should not allow modification(as modification may break), Instead of modifying the class, extend it
+
+InvoiceDao{
+	Invoice invoice ;
+	
+	// constructors and other fields
+	
+	public void saveToDB(){
+		// saves
+	}
+	
+	public void saveToFile(){
+		// saves
+	}
+}
+
+above InvoiceDao does not follow "O" principle. we should not just add saveToFile(), to existing live file. 
+Instead create an InvoiceDao interface
+
+interface InvoiceDao {
+	public void save(Invoice invoice) ;
+
+}
+
+
+Now , saveToDB, saveToFile etc can implement this interface and add their own implementation
+
+FileInvoiceDao implments InvoiceDao{
+	
+	@Override
+	public void save(Invoice invoice){
+		// impl
+	}
+
+}
+
+
+
+L - *Liskov Sub - When extended, functionality should increase never decrease like bicycle class extending bike (sub-type should extend functionality)
+. Code should work if a child sub-type object replaces the parent.
+
+https://www.youtube.com/watch?v=129QkkXUHeQ&list=PL6W8uoQQ2c61X_9e6Net0WdYZidm7zooW&index=3
+
+
+
+
+
+
+
+I - Interface Segregation - Client should only implement interfaces it needed, if interface has spurious methods segregate the interface
+
+interface RestaurentEmployee {
+	
+	public void washDishes() ; 
+	public void cookfood():
+	public void serveCustomers() ;
+
+}
+
+If an Employee wait is created via RestaurentEmployee, then it will have to implment all methods of the RestaurentEmployee
+but does waiter washDishes OR cookfood. ???
+So segregate the interfaces : 
+
+
+interface RestaurentWaiter {
+
+	public void takeOrders():
+	public void serveCustomers() ;
+
+}
+
+interface RestaurentCook {
+
+	public void cookfood():
+	public void decideMenu() ;
+
+}
+
+
+
+D - Dependency Inversions - dependencies should be added via constructor injection, this provides us with the functionality to add different types of objects
+Class should depend on Interface rather than concrete impls
+
+class Macbook {
+	private final WiredKeyboard keyboard; 
+	private final WiredMouse mouse;
+	
+	Macbook(){
+		this.keyboard = new WiredKeyboard();
+		this.mouse = new WiredMouse();
+	}
+}
+
+Above is wrong, we are coding to classes, also we are restricted by type of objects
+
+class Macbook {
+	private final Keyboard keyboard; 
+	private final Mouse mouse;
+	
+	Macbook(Keyboard keyboard,Mouse mouse){
+		this.keyboard = keyboard;
+		this.mouse = mouse;
+	}
+}
+
+Keyboard and Mouse are interfaces. we can pass any implmentation in constructor
+
+
+Benefits : 
+Flexible code
+easy to maintain
+easy to understand
