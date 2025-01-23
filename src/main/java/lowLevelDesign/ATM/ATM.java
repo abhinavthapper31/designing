@@ -60,6 +60,7 @@ public class ATM {
 
     public boolean authenticateCardPin(Card card, int pin) {
         // call card auth class.
+        // for now add auth logic in card
         return card.authenticatepin(pin);
     }
 

@@ -1,6 +1,6 @@
 package lowLevelDesign.designPatterns.prototypePattern;
 
-public class App {
+public class App implements Cloneable {
 
     //  Used to make copy/clone from an existing object
     // Spring prototype bean

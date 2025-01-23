@@ -19,12 +19,6 @@ public class App {
     public static void main(String[] args) {
         VendingMachine machine = new VendingMachine(getInitialInventory());
         displayInventory( machine);
-
-
-
-
-
-
     }
 
     private static Inventory getInitialInventory() {
@@ -54,7 +48,6 @@ public class App {
 
 
     private static void displayInventory(VendingMachine vendingMachine){
-
         Shelf[] slots = vendingMachine.getInventory().getInventory();
         for (int i = 0; i < slots.length; i++) {
             System.out.println(slots[i]);

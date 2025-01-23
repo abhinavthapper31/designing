@@ -2,7 +2,8 @@ package lowLevelDesign.designPatterns.mediatorPattern;
 
 public class Bidder implements IBidder {
 
-    String name;
+    private AuctionMediator mediator;
+    private String name;
 
     void Bidder(String name) {
         this.name = name;
@@ -10,7 +11,7 @@ public class Bidder implements IBidder {
 
     @Override
     public void placeBid(int amount) {
-
+        mediator.placeBid(this, amount);
     }
 
     @Override

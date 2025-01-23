@@ -6,9 +6,12 @@ import java.util.List;
 public class Auction implements AuctionMediator {
 
     private List<Bidder> bidders;
+    private IBidder highestBidder;
+    private int highestAmount;
 
     Auction() {
         bidders = new ArrayList<>();
+        highestAmount = 0;
     }
 
     @Override
@@ -21,10 +24,24 @@ public class Auction implements AuctionMediator {
         System.out.println("Received bid of amount " + amount + " by bidder " + bidder.getName());
 
         for (Bidder b : this.bidders) {
-            if (!b.name.equalsIgnoreCase(bidder.getName())) {
-                b.receiveBidNotification(amount);
+
+            if (amount > highestAmount) {
+                highestBidder = bidder;
+                highestAmount = amount;
+                if (!b.getName().equalsIgnoreCase(bidder.getName())) {
+                    b.receiveBidNotification(amount);
+                }
             }
+
+
         }
 
+    }
+
+    @Override
+    public void announceWinner() {
+        if (highestBidder != null) {
+            // print winner
+        }
     }
 }

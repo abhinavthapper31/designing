@@ -1,4 +1,4 @@
 package lowLevelDesign.parkingLot;
 
-public class APp {
+public class App {
 }

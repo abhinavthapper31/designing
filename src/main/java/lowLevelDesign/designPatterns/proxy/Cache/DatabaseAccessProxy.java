@@ -22,6 +22,7 @@ public class DatabaseAccessProxy implements IDatabaseAccess {
         if (employeeFromCache != null) {
             return employeeFromCache;
         }
+
         Employee emp = access.getEmployeeById(employeeId);
         this.storage.add(emp);
         return emp;

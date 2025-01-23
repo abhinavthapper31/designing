@@ -2,7 +2,7 @@ package lowLevelDesign.designPatterns.strategyPattern;
 
 public class Vehicle {
 
-    DrivingStrategy strategy;
+    private DrivingStrategy strategy;
 
     // Vehicle creation requires strategy of that vehicle
     // Constructor injection

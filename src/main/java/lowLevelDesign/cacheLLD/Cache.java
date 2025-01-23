@@ -26,7 +26,6 @@ public class Cache<Key, Value> {
             storage.put(key, value);
             evictionPolicy.keyAccessed(key);
         }
-
     }
 
     public Value get(Key key){

@@ -9,12 +9,15 @@ import java.util.HashMap;
 public class LRUPolicy<Key> implements EvictionPolicy<Key> {
 
     Deque<Node<Key>> dll;
+
+    // Map is needed for fast access
     HashMap<Key, Node<Key>> mapper;
 
     public LRUPolicy() {
         dll = new ArrayDeque<>();
         mapper = new HashMap<>();
     }
+
 
     @Override
     public void keyAccessed(Key key) {

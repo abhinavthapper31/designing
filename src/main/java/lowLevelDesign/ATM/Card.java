@@ -19,7 +19,6 @@ public class Card {
         if (this.pin == pin) {
             return true;
         }
-
         return false;
     }
 

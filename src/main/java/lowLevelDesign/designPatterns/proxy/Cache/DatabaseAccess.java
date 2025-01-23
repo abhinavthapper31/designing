@@ -7,6 +7,6 @@ public class DatabaseAccess implements IDatabaseAccess {
     public Employee getEmployeeById(Integer employeeId) {
 
         // employee from db
-        return new Employee("Jake", "mathews");
+        return new Employee("Jake", "Mathews");
     }
 }
