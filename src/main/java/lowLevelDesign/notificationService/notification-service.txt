@@ -1,0 +1,172 @@
+
+enum NotificationType {
+     EMAIL, SMS, PUSH
+}
+
+public class UserProfile {
+    private String userId;
+    private String phoneNumber;
+    private String deviceId;
+    private boolean isSmsEnabled;
+    private boolean isPushEnabled;
+    private boolean isEmailEnabled;
+
+    // getters and setters
+}
+
+public class NotificationSenderFactory {
+    public static NotificationSender getSender(NotificationType type) {
+        switch (type) {
+            case EMAIL:
+                return new EmailNotificationSender();
+            case SMS:
+                return new SmsNotificationSender();
+            case PUSH:
+                return new PushNotificationSender();
+            default:
+                return null;
+        }
+    }
+}
+
+
+public class Notification{
+    private String id;
+    private String slug;
+    private String templateContent;
+    private boolean email;
+    private boolean sms;
+    private boolean push;
+
+}
+
+public interface NotificationSender {
+    void sendNotification(NotificationRequest request);
+}
+
+public interface QueueProcessor {
+    void processQueue();
+}
+
+
+public class EmailNotificationSender implements NotificationSender,QueueProcessor{
+        private Queue<NotificationTask> queue = new LinkedList<>();
+
+        @Override
+        public void sendNotification(UserProfile userProfile, String notificationId, Map<String, String> tokens) {
+            // get the Notification Object by notificationId
+            Notification notification = getNotificationDetailsById(notificationId) ;
+            queue.offer(new NotificationTask(tokens, notification.getTemplateContent(), userProfile));
+        }
+
+        @Override
+        public void processQueue() {
+            while (!queue.isEmpty()) {
+                NotificationTask task = queue.poll();
+                // get template
+                // replace the values by tokens
+                // send the Email using the AWS SES service
+            }
+        }
+}
+
+
+public class SmsNotificationSender implements NotificationSender, QueueProcessor {
+    private Queue<NotificationTask> queue = new LinkedList<>();
+
+    @Override
+    public void sendNotification(NotificationRequest request) {
+        Notification notification = getNotificationDetailsById(request.getNotificationSlug());
+        UserProfile userProfile = getUserProfileById(request.getUserId());
+        queue.offer(new NotificationTask(request.getTokens(), notification.getTemplateContent(), userProfile));
+    }
+
+    @Override
+    public void processQueue() {
+        while (!queue.isEmpty()) {
+            NotificationTask task = queue.poll();
+            String message = replaceTokens(task.getTemplateContent(), task.getTokens());
+            sendSms(task.getUserProfile().getPhoneNumber(), message);
+        }
+    }
+
+    private void sendSms(String phoneNumber, String message) {
+        System.out.println("Sending SMS to " + phoneNumber + ": " + message);
+    }
+}
+
+public class PushNotificationSender implements NotificationSender, QueueProcessor {
+    private Queue<NotificationTask> queue = new LinkedList<>();
+
+    @Override
+    public void sendNotification(NotificationRequest request) {
+        Notification notification = getNotificationDetailsById(request.getNotificationSlug());
+        UserProfile userProfile = getUserProfileById(request.getUserId());
+        queue.offer(new NotificationTask(request.getTokens(), notification.getTemplateContent(), userProfile));
+    }
+
+    @Override
+    public void processQueue() {
+        while (!queue.isEmpty()) {
+            NotificationTask task = queue.poll();
+            String message = replaceTokens(task.getTemplateContent(), task.getTokens());
+            sendPushNotification(task.getUserProfile().getDeviceId(), message);
+        }
+    }
+
+    private void sendPushNotification(String deviceId, String message) {
+        System.out.println("Sending push notification to " + deviceId + ": " + message);
+    }
+}
+
+
+public class NotificationRequest{
+    private String userId;
+    Map<String, String> tokens ;
+    private notificationSlug;
+    NotificationType type;
+
+    // getter and setters
+}
+
+public class NotificationService {
+    UserService userService;
+    NotificationSenderFactory notificationSenderFactory;
+
+    // DI
+    NotificationService (UserService userService, NotificationSenderFactory notificationSenderFactory){
+        this.userService = userService;
+        this.notificationSenderFactory = notificationSenderFactory;
+    }
+
+    public void sendNotification(NotificationRequest request) {
+        // NPE checks and all
+
+        UserProfile userProfile = userService.getUserProfile(request.getUserId()) ;
+        Notification notificationMaster = getNotificationDetails(request.getNotificationSlug()) ;
+
+        if (notificationMaster.isSms() && userProfile.isSmsEnabled()) {
+            notificationSenderFactory.getSender("SMS").sendNotification(request);
+        }
+
+        if (notificationMaster.isPush() && userProfile.isPushEnabled()) {
+            notificationSenderFactory.getSender("PUSH").sendNotification(request);
+        }
+
+        if (notificationMaster.isEmail() && userProfile.isEmailEnabled()) {
+            notificationSenderFactory.getSender("EMAIL").sendNotification(request);
+        }
+    }
+
+    public void processAllQueues() {
+        // for all enums values process the queues
+        for (NotificationType type : NotificationType.values()) {
+            notificationSenderFactory.getSender(type).processQueue();
+        }
+    }
+}
+
+
+
+
+
