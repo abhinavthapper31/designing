@@ -3,6 +3,8 @@ package lowLevelDesign.ATM;
 import lowLevelDesign.ATM.states.IdleState;
 import lowLevelDesign.ATM.states.State;
 
+import java.util.HashSet;
+
 public class ATM {
     private State state;
     private int twoThousandNotes;

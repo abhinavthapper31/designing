@@ -9,7 +9,7 @@ public class CustomerMessage {
     private boolean smsOpted;
     private boolean emailOpted;
 
-    CustomerMessage(CustomerMessageBuilder builder) {
+    private CustomerMessage(CustomerMessageBuilder builder) {
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
         this.phoneNumber = builder.phoneNumber;
@@ -58,7 +58,7 @@ public class CustomerMessage {
             return this;
         }
 
-        CustomerMessage build(){
+        CustomerMessage build() {
             return new CustomerMessage(this);
         }
     }

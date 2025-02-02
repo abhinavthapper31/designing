@@ -1,0 +1,177 @@
+
+enum VehicleType {
+    CAR, BIKE, TRUCK
+}
+
+enum ParkingSpotSize{
+    SMALL, MEDIUM, LARGE
+}
+
+interface ParkingStrategy {
+    ParkingSpot findParkingSpot(List<ParkingLevel> levels, VehicleType type);
+}
+
+// find first
+class DefaultParkingStrategy implements ParkingStrategy {
+    public ParkingSpot findParkingSpot(List<ParkingLevel> levels, VehicleType type) {
+        for (ParkingLevel level : levels) {
+            ParkingSpot spot = level.findAvailableSpot(type);
+            if (spot != null) {
+                return spot;
+            }
+        }
+        return null;
+    }
+}
+
+class ParkingSpot {
+    private String spotId;
+    private ParkingSpotSize size;
+    private Vehicle vehicle;
+
+    void parkVehicle(Vehicle vehicle){
+        this.vehicle = vehicle;
+    }
+    Vehicle getParkedVehicle();
+
+    boolean isOccupied(){return vehicle != null;}
+}
+
+class Receipt {
+    private String receiptId;
+    private String vehicleId;
+    private Date entryTime;
+    private Date exitTime;
+    private double amountDue;
+    private static final double RATE_PER_HOUR = 10.0;
+
+    public Receipt(String receiptId, String vehicleId, Date entryTime) {
+        this.receiptId = receiptId;
+        this.vehicleId = vehicleId;
+        this.entryTime = entryTime;
+    }
+
+    public void setExitTime(Date exitTime) {
+        this.exitTime = exitTime;
+        calculateBill();
+    }
+
+    public void printReceipt() {
+    }
+
+    public void calculateBill(){
+        // calculate bill : (exitTime - enterTime) * Rate
+        // set in "this" receipt
+    }
+}
+
+abstract class Vehicle {
+    private String vehicleId;
+    private VehicleType type;
+
+    public Vehicle(String vehicleId, VehicleType type) {
+        this.vehicleId = vehicleId;
+        this.type = type;
+    }
+}
+
+class Car extends Vehicle{
+    Car(String id){super.Vehicle(id,VehicleType.CAR)}
+}
+
+class Bike extends Vehicle{
+    Bike(String id){super.Vehicle(id,VehicleType.BIKE)}
+}
+
+class Truck extends Vehicle{
+    Truck(String id){super.Vehicle(id,VehicleType.TRUCK)}
+}
+
+class ParkingLevel {
+    private int levelNumber;
+    private List<ParkingSpot> spots;
+    private static countParkedSpots;
+
+        public ParkingLevel(int levelNumber, int smallSpots, int mediumSpots, int largeSpots) {
+            this.levelNumber = levelNumber;
+            this.spots = new ArrayList<>();
+            for (int i = 0; i < carSpots; i++) {
+                spots.add(new ParkingSpot("S" + i, VehicleType.SMALL));
+            }
+            for (int i = 0; i < bikeSpots; i++) {
+                spots.add(new ParkingSpot("M" + i, VehicleType.MEDIUM));
+            }
+            for (int i = 0; i < truckSpots; i++) {
+                spots.add(new ParkingSpot("L" + i, VehicleType.LARGE));
+            }
+            countParkedSpots =  0;
+        }
+
+        // level has responsibility of telling is spot is available or not.
+        public ParkingSpot findAvailableSpot(VehicleType type) {
+                for (ParkingSpot spot : spots) {
+                    if (!spot.isOccupied() && spot.getType() == type) {
+                        return spot;
+                    }
+                }
+                return null;
+          }
+}
+
+class ParkingLot {
+    private List<ParkingLevel> levels;
+    private Map<String, ParkingSpot> occupiedSpots; // for O(1) lookup, vehicleId to spot map
+    private Map<String, Receipt> receipts; // all receipts generated till now. vehicle to spot map
+    private ParkingStrategy parkingStrategy; // one strategy for all the levels
+
+    public ParkingLot(int numLevels, int smallSpotsPerLevel, int mediumSpotsPerLevel, int largeSpotsPerLevel) {
+        levels = new ArrayList<>();
+        occupiedSpots = new HashMap<>();
+        receipts = new HashMap<>();
+        for (int i = 0; i < numLevels; i++) {
+            levels.add(new ParkingLevel(i, smallSpotsPerLevel, mediumSpotsPerLevel, largeSpotsPerLevel));
+        }
+    }
+
+    public boolean parkVehicle(Vehicle vehicle) {
+        ParkingSpot spot = parkingStrategy.findParkingSpot(levels, vehicle.getType());
+        if (spot != null) {
+            spot.parkVehicle();
+            occupiedSpots.put(vehicle.getVehicleId(), spot);
+
+            String receiptId = "R" + System.currentTimeMillis();
+            Receipt receipt = new Receipt(receiptId, vehicle.getVehicleId(), new Date());
+            receipts.put(vehicle.getVehicleId(), receipt);
+
+            System.out.println("Vehicle " + vehicle.getVehicleId() + " parked");
+            return true;
+        }
+        System.out.println("Not found");
+        return false;
+    }
+
+    public boolean removeVehicle(String vehicleId) {
+        if (occupiedSpots.containsKey(vehicleId) && receipts.containsKey(vehicleId)) {
+            ParkingSpot spot = occupiedSpots.get(vehicleId);
+            spot.removeVehicle();
+            occupiedSpots.remove(vehicleId);
+
+             receipts.get(vehicleId).setExitTime(new Date()); // add end time
+             receipts.get(vehicleId).printReceipt();
+
+            return true;
+        }
+        System.out.println("Vehicle " + vehicleId + " not found in parking lot.");
+        return false;
+    }
+
+    // Parking Entry Gate functionality
+    public boolean allowEntry(Vehicle vehicle) {
+        return parkVehicle(vehicle);
+    }
+
+    // Parking Exit Gate functionality
+    public boolean allowExit(String vehicleId) {
+        return removeVehicle(vehicleId);
+    }
+}
