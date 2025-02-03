@@ -1,7 +1,7 @@
 package lowLevelDesign.vendingMachine.States.impl;
 
-import lowLevelDesign.vendingMachine.Coin;
-import lowLevelDesign.vendingMachine.Product;
+import lowLevelDesign.vendingMachine.models.Coin;
+import lowLevelDesign.vendingMachine.models.Product;
 import lowLevelDesign.vendingMachine.States.State;
 import lowLevelDesign.vendingMachine.VendingMachine;
 

@@ -1,4 +1,4 @@
-package lowLevelDesign.vendingMachine;
+package lowLevelDesign.vendingMachine.models;
 
 public class Shelf {
 

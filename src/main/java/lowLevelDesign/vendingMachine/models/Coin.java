@@ -1,9 +1,9 @@
-package lowLevelDesign.vendingMachine;
+package lowLevelDesign.vendingMachine.models;
 
 public class Coin {
     CoinType coinType;
 
-    Coin(CoinType type) {
+    public Coin(CoinType type) {
         this.coinType = type;
     }
 

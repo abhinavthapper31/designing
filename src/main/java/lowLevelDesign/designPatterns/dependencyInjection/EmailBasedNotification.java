@@ -1,4 +1,4 @@
-package lowLevelDesign.dependencyInjection;
+package lowLevelDesign.designPatterns.dependencyInjection;
 
 public class EmailBasedNotification implements NotificationSender {
 

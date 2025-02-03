@@ -1,5 +1,10 @@
 package lowLevelDesign.vendingMachine;
 
+import lowLevelDesign.vendingMachine.models.Inventory;
+import lowLevelDesign.vendingMachine.models.ItemType;
+import lowLevelDesign.vendingMachine.models.Product;
+import lowLevelDesign.vendingMachine.models.Shelf;
+
 public class App {
 
     /*

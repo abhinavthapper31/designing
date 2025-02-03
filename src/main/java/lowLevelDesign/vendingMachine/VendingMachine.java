@@ -2,6 +2,9 @@ package lowLevelDesign.vendingMachine;
 
 import lowLevelDesign.vendingMachine.States.State;
 import lowLevelDesign.vendingMachine.States.impl.IdleState;
+import lowLevelDesign.vendingMachine.models.Coin;
+import lowLevelDesign.vendingMachine.models.CoinType;
+import lowLevelDesign.vendingMachine.models.Inventory;
 
 import java.util.ArrayList;
 import java.util.List;
