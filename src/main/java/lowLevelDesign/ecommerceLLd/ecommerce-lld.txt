@@ -1,0 +1,214 @@
+public enum ProductType {
+    ELECTRONICS,
+    CLOTHING,
+    FOOD,
+    FURNITURE;
+}
+
+public class Customer {
+    private String id;
+    private String name;
+    private String email;
+    private String password;
+
+    public Customer(String name, String email, String password) {
+        this.id = UUID.randomUUID().toString();
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+    // getters
+}
+
+public class Merchant {
+    private String id;
+    private String name;
+    private String contactInfo;
+
+    public Merchant(String name, String contactInfo) {
+        this.id = UUID.randomUUID().toString();
+        this.name = name;
+        this.contactInfo = contactInfo;
+    }
+    // getters
+}
+
+import java.util.UUID;
+
+public class Product {
+    private String id;
+    private String name;
+    private double price;
+    private ProductType type;
+    private int stock;
+    private Merchant merchant;  // Merchant associated with the product
+
+    public Product(String name, double price, ProductType type, int stock, Merchant merchant) {
+        this.id = UUID.randomUUID().toString();
+        this.name = name;
+        this.price = price;
+        this.type = type;
+        this.stock = stock;
+        this.merchant = merchant; // Associate product with merchant
+    }
+    // getters
+
+    // synchronized for concurrent access
+    public synchronized void reduceStock(int quantity) {
+        if (stock >= quantity) {
+            stock -= quantity;
+        } else {
+            throw new IllegalArgumentException("Not enough stock.");
+        }
+    }
+
+    public synchronized void addStock(int quantity) {
+        stock += quantity;
+    }
+}
+
+public enum OrderStatus {
+    PENDING,
+    COMPLETED,
+    CANCELED;
+}
+
+public class CartItem{
+    Product product;
+    int count;
+}
+
+public class Order {
+    private final String id;
+    private final List<CartItem> products;
+    private final String customerName;
+    private double totalAmount;
+    private OrderStatus status;
+
+    public Order(String customerName, List<CartItem> products) {
+        this.id = UUID.randomUUID().toString();
+        this.customerName = customerName;
+        this.products = products;
+        this.status = OrderStatus.PENDING;
+        this.totalAmount = calculateTotal();
+    }
+
+    private double calculateTotal() {
+        return products.stream().mapToDouble(Product::getPrice).sum();
+    }
+
+    // getters
+
+    public void processOrder() {
+        this.status = OrderStatus.COMPLETED;
+    }
+}
+
+public class InventoryManager {
+    private Map<String, Product> products;
+    private Map<String, Merchant> merchants;
+    private List<Order> orders;
+
+    public InventoryManager() {
+        products = new ConcurrentHashMap<>();
+        merchants = new ConcurrentHashMap<>();
+        orders = Collections.synchronizedList(new ArrayList<>());
+    }
+
+    public void addMerchant(String name, String contactInfo) {
+        Merchant merchant = new Merchant(name, contactInfo);
+        merchants.put(merchant.getId(), merchant);
+    }
+
+    public void addProduct(String name, double price, ProductType type, int stock, Merchant merchant) {
+        Product product = new Product(name, price, type, stock, merchant);
+        products.put(product.getId(), product);
+    }
+
+    public void restockProduct(String productId, int quantity) {
+        Product product = products.get(productId);
+        if (product != null) {
+            product.addStock(quantity);
+        }
+    }
+}
+
+public class OrderService {
+    private InventoryManager inventoryManager;
+
+    OrderService(InventoryManager inventoryManager){
+      this.inventoryManager = inventoryManager;
+    }
+
+    // for concurrent use, this should be in a separate OrderService
+    // and
+    public synchronized Order processOrder(String customerName, List<CartItem> productQuantities) {
+        List<Product> orderedProducts = new ArrayList<>();
+
+        for (CartItem item : productQuantities) {
+            Product product = item.getProduct();
+
+            if (product == null || !product.reduceStock(product.getQuantity())) {
+                System.out.println("Order failed due to insufficient stock: " + product.getName());
+                return false;
+            }
+            orderedProducts.add(product);
+        }
+
+        Order order = new Order(customerName, orderedProducts);
+        orders.add(order);
+        order.processOrder();
+        System.out.println("Order placed successfully: " + order.getId());
+        return order;
+    }
+
+}
+
+public class EcommerceSystem {
+    private List<Customer> customers;
+    private List<Order> orders;
+    private InventoryManager inventoryManager;
+    public EcommerceSystem(InventoryManager inventoryManager) {
+        customers = new ArrayList<>();
+        orders = new ArrayList<>();
+        inventoryManager = inventoryManager;
+    }
+
+    public void addMerchant(String name, String contactInfo) {
+        inventoryManager.addMerchant(name, contactInfo);
+    }
+
+    public void addProduct(String name, double price, ProductType type, int stock, Merchant merchant) {
+        inventoryManager.addProduct(name, price, type, stock, merchant);
+    }
+
+    public void registerCustomer(String name, String email, String password) {
+        // customer manager
+        Customer customer = new Customer(name, email, password);
+        customers.add(customer);
+    }
+
+    // customer orders products
+    public void placeOrder(Customer customer, List<Product> products) {
+        // call the order service
+        Order order = new Order(customer, products);
+        orders.add(order);
+
+        // Process Payment
+        Payment payment = new Payment(order.getId(), order.getTotalAmount());
+        payment.makePayment();
+
+        // Ship Order
+        Shipping shipping = new Shipping(order.getId());
+        shipping.shipOrder();
+
+        // Mark Product Stock
+        for (Product product : products) {
+            product.reduceStock(1);
+        }
+
+        order.processOrder();
+        System.out.println("Order placed successfully: " + order.getId());
+    }
+
+}

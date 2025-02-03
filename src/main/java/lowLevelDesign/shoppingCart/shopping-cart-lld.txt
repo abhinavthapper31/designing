@@ -1,0 +1,253 @@
+
+
+class Merchant {
+    private String merchantId;
+    private String name;
+    private String contactInfo;
+
+    public Merchant(String merchantId, String name, String contactInfo) {
+        this.merchantId = merchantId;
+        this.name = name;
+        this.contactInfo = contactInfo;
+    }
+    // getters
+}
+
+class Product {
+    private String productId;
+    private String name;
+    private String description;
+    private int stock;
+    private Merchant merchant;  // The merchant offering this product
+    private double price;
+    // other products specific details
+
+    public Product(String productId, String name, String description, Merchant merchant, double price, int stock) {
+        this.productId = productId;
+        this.name = name;
+        this.description = description;
+        this.merchant = merchant;
+        this.stock  =stock;
+        this.price = price;
+    }
+    // getters
+}
+
+// will be added to cart
+class CartItem {
+    private Product product;
+    private int quantity;
+
+    public CartItem(Product product, int quantity) {
+        this.product = product;
+        this.quantity = quantity;
+    }
+
+    public Product getProduct() {return product;}
+
+    public int getQuantity() {return quantity;}
+
+    // to update the quantity of the product
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public double getTotalPrice() {
+        return product.getPrice() * quantity;
+    }
+}
+
+class Cart {
+    private Map<String, CartItem> items;
+    private double totalAmount;
+
+    public Cart() {
+        this.items = new HashMap<>();
+        this.totalAmount = 0.0;
+    }
+
+    // Add or update a product in the cart
+    public void addItem(Product product, int quantity) {
+        // discuss this with the interviewer about the key ???
+        String key = product.getProductId() + ":" + product.getMerchant().getMerchantId();
+        if (items.containsKey(key)) {
+            // if item already there, update the quantity
+            CartItem existingItem = items.get(key);
+            existingItem.setQuantity(existingItem.getQuantity() + quantity);
+        } else {
+            CartItem newItem = new CartItem(product, quantity);
+            items.put(key, newItem);
+        }
+        updateTotalAmount();
+    }
+
+    public void removeItem(Product product) {
+        String key = product.getProductId() + ":" + product.getMerchant().getMerchantId();
+        CartItem item = items.remove(key);
+        product.setStock(product.getStock() + item.getQuantity()) ;
+        updateTotalAmount();
+    }
+
+    // to support the reduce by one feature
+    public void updateItemQuantity(Product product, int quantity) {
+        String key = product.getProductId() + ":" + product.getMerchant().getMerchantId();
+        if (items.containsKey(key)) {
+            CartItem item = items.get(key);
+            item.setQuantity(quantity);
+            product.setStock(product.getStock()- quantity) ;
+            updateTotalAmount();
+        }
+    }
+
+    // Calculate the total price of the cart
+    private void updateTotalAmount() {
+        totalAmount = 0.0;
+        for (CartItem item : items.values()) {
+            totalAmount += item.getTotalPrice();
+        }
+    }
+
+    public double getTotalAmount() {return totalAmount;}
+
+    public Map<String, CartItem> getItems() {return items;}
+}
+
+class User {
+    private String userId;
+    private String name;
+    private String email;
+    private Cart cart;
+
+    public User(String userId, String name, String email) {
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
+        this.cart = new Cart();
+    }
+    // getters
+}
+
+class Payment {
+    private String paymentId;
+    private double amount;
+    private String paymentMethod;
+    private String status; // "Pending", "Completed", "Failed"
+
+    public Payment(String paymentId, double amount, String paymentMethod) {
+        this.paymentId = paymentId;
+        this.amount = amount;
+        this.paymentMethod = paymentMethod;
+        this.status = "Pending";
+    }
+
+    // getters
+
+    public boolean processPayment() {
+        // Simulating payment processing logic (this would normally call a payment gateway API)
+        System.out.println("Processing payment of amount: " + amount);
+        this.status = "Completed";  // Assume the payment is successful for now
+        return true;  // Return true for successful payment processing
+    }
+}
+
+import java.util.*;
+
+class Order {
+    private String orderId;
+    private User user;
+    private Cart cart;
+    private Payment payment;
+    private String status;  // "Created", "Confirmed", "Shipped"
+    private Date orderDate;
+
+    public Order(String orderId, User user, Cart cart, Payment payment) {
+        this.orderId = orderId;
+        this.user = user;
+        this.cart = cart;
+        this.payment = payment;
+        this.status = "Created";
+        this.orderDate = new Date();
+    }
+    // getters
+
+    public void confirmOrder() {
+        if (payment.getStatus().equals("Completed")) {
+            this.status = "Confirmed";
+            System.out.println("Order " + orderId + " has been confirmed.");
+        } else {
+            System.out.println("Payment not completed. Cannot confirm the order.");
+        }
+    }
+}
+
+class CheckoutProcess {
+    private User user;
+
+    // DI
+    public CheckoutProcess(User user) {
+        this.user = user;
+    }
+
+    public Order checkout() {
+        Cart cart = user.getCart();
+        System.out.println("Total Cart Amount: " + cart.getTotalAmount());
+
+        Payment payment = initiatePayment(cart.getTotalAmount());
+
+        if (payment.processPayment()) {
+            Order order = new Order(generateOrderId(), user, cart, payment);
+            System.out.println("Order Created with ID: " + order.getOrderId());
+            order.confirmOrder();
+            return order;
+        } else {
+            System.out.println("Payment failed. Checkout process aborted.");
+            return null;
+        }
+    }
+
+    private Payment initiatePayment(double amount) {
+        String paymentId = "PAY" + System.currentTimeMillis();  // Generate a unique payment ID
+        String paymentMethod = "Credit Card";  // Assume credit card for simplicity
+        Payment payment = new Payment(paymentId, amount, paymentMethod);
+        return payment;
+    }
+
+    private String generateOrderId() {
+        return "ORD" + System.currentTimeMillis();
+    }
+}
+
+
+
+// checkout process :
+
+public class ShoppingCartExample {
+    public static void main(String[] args) {
+        // Create merchants
+        Merchant amazon = new Merchant("M1", "Amazon", "contact@amazon.com");
+        Merchant ebay = new Merchant("M2", "eBay", "contact@ebay.com");
+
+        // Create products
+        Product laptop = new Product("P1", "Laptop", "High-performance laptop", amazon, 1000.0);
+        Product phone = new Product("P2", "Phone", "Latest model phone", ebay, 800.0);
+
+        // Create user
+        User user = new User("U1", "John Doe", "johndoe@gmail.com");
+
+        // Add items to the user's cart
+        Cart cart = user.getCart();
+        cart.addItem(laptop, 1);  // 1 Laptop from Amazon
+        cart.addItem(phone, 2);   // 2 Phones from eBay
+
+        // Checkout Process
+        CheckoutProcess checkoutProcess = new CheckoutProcess(user);
+        Order order = checkoutProcess.checkout(); // checkout creates and order object
+
+        // Send order confirmation
+        if (order != null) {
+            OrderConfirmation orderConfirmation = new OrderConfirmation(order);
+            orderConfirmation.sendConfirmation();
+        }
+    }
+}
+

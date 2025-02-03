@@ -1,0 +1,275 @@
+
+// enums
+
+public enum PaymentStatus {
+    PENDING, SUCCESS, FAILED
+}
+
+public enum OrderStatus {
+    PLACED, CONFIRMED, PREPARING, READY_FOR_PICKUP, OUT_FOR_DELIVERY, DELIVERED, CANCELLED
+}
+
+public enum UserType {
+   CUSTOMER, RESTAURANT_OWNER, DELIVERY_AGENT
+}
+
+// entities
+public class User {
+    private String userId;
+    private String name;
+    private String email;
+    private String phoneNumber;
+    private String address;
+    private UserType userType;
+}
+
+public class Restaurant {
+    private String restaurantId;
+    private String name;
+    private String address;
+    private List<Menu> menus; // one restaurent can have multiple menus
+    private boolean isOpen;
+    private List<Order> orders;
+
+    public void addMenu(Menu menu) {menus.add(menu);}
+
+    public void removeMenu(Menu menu) {menus.remove(menu);}
+
+    public List<Menu> getMenus() {return menus;}
+
+    public void addOrder(Order order){this.orders.add(order);}
+}
+
+public class Menu {
+    private String menuId;
+    private String name;
+    private List<MenuItem> menuItems;
+
+    public void addItem(MenuItem item) {menuItems.add(item);}
+
+    public void removeItem(MenuItem item) {menuItems.remove(item);}
+
+    public List<MenuItem> getMenuItems() { menuItems;}
+}
+
+public class MenuItem {
+    private String itemId;
+    private String name;
+    private double price;
+    private String description;
+    private boolean isAvailable;
+
+    public void updateAvailability(boolean available) {
+        this.isAvailable = available;
+    }
+}
+
+public class Order {
+    private String orderId;
+    private User customer;
+    private Restaurant restaurant;
+    private List<MenuItem> items; // list of items in the order
+    private OrderStatus status;
+    private Payment payment;
+
+    public void updateOrderStatus(OrderStatus newStatus) ;
+
+    public int getOrderAmount(){return payment.getAmount();}
+
+    public isPaymentDone(){return payment.getStatus() = PAID};
+}
+
+public class Payment {
+    private String paymentId;
+    private PaymentStatus status;
+    private double amount;
+}
+
+public class FoodOrderSystem {
+    private UserService userService; //
+    private RestaurantService restaurantService;
+    private PaymentService paymentService;
+    private OrderAssignmentService orderAssignmentService;
+    private OrderTrackingService orderTrackingService;
+
+    // more fields for aggregated metrics, List<Orders>, List<Delivery>
+
+    // DI (Dependency Injection) Constructor
+    public FoodOrderSystem(UserService userService, RestaurantService restaurantService,
+                           PaymentService paymentService, OrderAssignmentService orderAssignmentService,
+                           OrderTrackingService orderTrackingService) {
+        this.userService = userService;
+        this.restaurantService = restaurantService;
+        this.paymentService = paymentService;
+        this.orderAssignmentService = orderAssignmentService;
+        this.orderTrackingService = orderTrackingService;
+    }
+
+    // User Places order from a restaurant
+    public Order placeAnOrder(String userId, String restaurantId, List<OrderItem> items) {
+        User customer = userService.getUserById(userId);
+        Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
+
+        if (customer == null || restaurant == null) {
+            // error
+        }
+        Order newOrder = new Order();
+        newOrder.setOrderId(UUID.randomUUID().toString());
+        newOrder.setCustomer(customer);
+        newOrder.setRestaurant(restaurant);
+        newOrder.setOrderItems(items);
+        newOrder.setStatus(OrderStatus.PLACED);
+        restaurantService.addOrderForRestaurant(newOrder,restaurant) ;
+        return newOrder;
+    }
+
+    // Method to make a payment for an order
+    public Payment makePaymentForAnOrder(Order order, String paymentMethod) {
+        double totalAmount = order.calculateTotalPrice();
+
+        Payment payment = paymentService.processPayment(order, paymentMethod);
+
+        if (payment.getStatus() == PaymentStatus.SUCCESS) {
+            order.setStatus(OrderStatus.CONFIRMED);
+        } else{
+            order.setStatus(OrderStatus.CANCEL);
+        }
+        return payment;
+    }
+
+    public Delivery assignAnOrder(Order order, List<User> availableAgents) {
+        // Use the order assignment strategy to pick an agent
+        User deliveryAgent = orderAssignmentService.assignDeliveryAgent(order, availableAgents);
+
+        if (deliveryAgent == null) {
+            // update the order status also
+            throw new IllegalStateException("No available delivery agents");
+        }
+
+        // Create and assign delivery
+        Delivery delivery = new Delivery();
+        delivery.setOrderId(order.getOrderId());
+        delivery.setDeliveryAgent(deliveryAgent);
+        delivery.setStatus(DeliveryStatus.OUT_FOR_DELIVERY);
+
+        // update delivery in the restaurant list?
+        return delivery;
+    }
+
+    public String trackOrderStatus(String orderId) {
+        // Fetch the order from the repository (assuming persistence logic exists)
+        // Order order = orderRepository.findById(orderId);
+
+        // For this example, let's assume we already have the order
+        Order order = new Order(); // Placeholder - replace with real fetch logic
+
+        // Use the OrderTrackingService to get real-time updates
+        String trackingInfo = orderTrackingService.sendRealTimeUpdate(order);
+
+        return trackingInfo;
+    }
+}
+
+public class PaymentService {
+    private static counter = 1;
+    // call third parties.
+
+    public Payment processPayment(Order order, String paymentMethod) {
+        // User Factory Pattern by methods type. ,paymentMethod should be an object
+        // External API call for payment processing
+
+        // Assume paymentMethod string has all the details.
+
+        // validate details input details ("paymentMethod")
+
+        // make API call or something card, sodex0, UPI etc
+
+        // confirm payment.
+        Payment payment = new Payment();
+        payment.setId(counter++) ;
+        payment.setAmount(order.getAmount()) ;
+        payment.setStatus(CONFIRMED);
+        return  payment;
+    }
+}
+
+public interface OrderAssignmentStrategy {
+    User assignDeliveryAgent(Order order, List<User> availableAgents);
+}
+
+public class NearestFirstAssignmentStrategy implements OrderAssignmentStrategy {
+    @Override
+    public User assignDeliveryAgent(Order order, List<User> availableAgents) {
+        if (availableAgents.isEmpty()) return null;
+
+        return availableAgents.stream()
+                .min((a, b) -> Double.compare(getDistance(a, order), getDistance(b, order)))
+                .orElse(null);
+    }
+
+    // get distance between the Delivery Agent and the restaurant order.
+    private double getDistance(User agent, Order order) {
+        // Use a distance calculation (Haversine formula, Google Maps API, etc.)
+        return Math.random() * 10; // Placeholder
+    }
+}
+
+import java.util.List;
+
+public class LeastLoadedAssignmentStrategy implements OrderAssignmentStrategy {
+    @Override
+    public User assignDeliveryAgent(Order order, List<User> availableAgents) {
+        // logic
+    }
+}
+
+
+public class OrderAssignmentService {
+    private OrderAssignmentStrategy strategy;
+
+    public OrderAssignmentService(OrderAssignmentStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public User assignDeliveryAgent(Order order, List<User> availableAgents) {
+        return strategy.assignDeliveryAgent(order, availableAgents);
+    }
+}
+
+public interface DeliveryRoutingStrategy {
+    String findOptimalRoute(String source, String destination);
+}
+
+public class DijkstraRoutingStrategy implements DeliveryRoutingStrategy {
+    @Override
+    public String findOptimalRoute(String source, String destination) {
+        // Implement Dijkstra's algorithm
+        return "Dijkstra Route from " + source + " to " + destination;
+    }
+}
+
+public class AStarRoutingStrategy implements DeliveryRoutingStrategy {
+    @Override
+    public String findOptimalRoute(String source, String destination) {
+        // Implement A* algorithm
+        return "A* Route from " + source + " to " + destination;
+    }
+}
+
+public class GoogleMapsRoutingStrategy implements DeliveryRoutingStrategy {
+    @Override
+    public String findOptimalRoute(String source, String destination) {
+        // Call Google Maps API for routing
+        return "Google Maps Route from " + source + " to " + destination;
+    }
+}
+
+public class DeliveryRoutingService {
+    private DeliveryRoutingStrategy strategy;
+    public DeliveryRoutingService(DeliveryRoutingStrategy strategy) {
+        this.strategy = strategy;
+    }
+    public String findOptimalRoute(String source, String destination) {
+        return strategy.findOptimalRoute(source, destination);
+    }
+}

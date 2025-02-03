@@ -1,0 +1,212 @@
+
+enum SeatType {
+    ECONOMY, PREMIUM, BUSINESS;
+}
+
+// number from and to, and timings
+class Flight {
+    private String flightNumber;
+    private String origin;
+    private String destination;
+    private Date departureTime;
+    private Date arrivalTime;
+    private Plane plane;  // plane with this flight
+    private List<Booking> bookings;
+
+    public Flight(String flightNumber, String origin, String destination, Date departureTime, Date arrivalTime, Plane plane) {
+        this.flightNumber = flightNumber;
+        this.origin = origin;
+        this.destination = destination;
+        this.departureTime = departureTime;
+        this.arrivalTime = arrivalTime;
+        this.plane = plane;
+        this.bookings = new ArrayList<>();
+    }
+
+    public boolean isSeatAvailable(int seatNumber) {
+        // does this flight have a seat ? we ask the plane object, if seat is
+        // available or not.
+        return plane.getSeats().get(seatNumber - 1).isAvailable();
+    }
+
+    // seat number is index for a passenger.
+    public boolean bookSeat(int seatNumber, Passenger passenger) {
+        if (isSeatAvailable(seatNumber)) {
+            plane.getSeats().get(seatNumber - 1).assignPassenger(passenger);
+            return true;
+        }
+        // log
+        return false;
+    }
+
+    public void cancelSeat(int seatNumber) {
+        plane.getSeats().get(seatNumber - 1).releaseSeat();
+    }
+
+    public Plane getPlane() {return plane;}
+
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+}
+
+public class Plane{
+    private String planeNumber;
+    private String modelNumber;
+    private List<Seat> seats;
+    private int capacity;
+    private Airline airline; // airline which this place belongs to.
+
+    Plane(String planeModel, int capacity, Airline airline){
+        this.planeModel = planeModel;
+        this.capacity = capacity;
+        this.airline = airline;
+        this.seats = new ArrayList<>();
+        // OR take input for type of seats in constructors.
+        for (int i = 1; i <= capacity/3 && i < this.seats; i++) {
+            this.seats.add(new Seat(i,SeatType.ECONOMY));
+        }
+        for (int i = 1; i <= capacity/3 && i < this.seats; i++) {
+            this.seats.add(new Seat(i,,SeatType.PREMIUM));
+        }
+        for (int i = 1; i <= capacity/3 && i < this.seats; i++) {
+            this.seats.add(new Seat(i,,SeatType.BUSINESS));
+        }
+
+    }
+    public int getCapacity() {return capacity;}
+
+    public List<Seat> getSeats() {return seats;}
+}
+
+
+class Seat {
+    private int seatNumber;
+    private boolean isAvailable;
+    private Passenger passenger;
+    private SeatType seatType;  // Type of seat (Economy, Premium, Business)
+
+    public Seat(int seatNumber, SeatType seatType) {
+        this.seatNumber = seatNumber;
+        this.isAvailable = true;
+        this.seatType = seatType;
+    }
+
+    public SeatType getSeatType() {return seatType;}
+
+    public boolean isAvailable() {return isAvailable;}
+
+    public void assignPassenger(Passenger passenger) {
+        this.passenger = passenger;
+        this.isAvailable = false;
+    }
+
+    public void releaseSeat() {
+        this.passenger = null;
+        this.isAvailable = true;
+    }
+
+}
+
+class Passenger {
+    private String passengerId;
+    private String name;
+    private String contact;
+
+    public Passenger(String passengerId, String name, String contact) {
+        this.passengerId = passengerId;
+        this.name = name;
+        this.contact = contact;
+    }
+}
+
+class FlightSchedule {
+    private Map<String, Flight> flights;
+
+    public FlightSchedule() {
+        this.flights = new HashMap<>();
+    }
+
+    // Add a flight to the schedule
+    public void addFlight(Flight flight) {
+        flights.put(flight.flightNumber, flight);
+    }
+
+    // Retrieve a flight from the schedule by flight number
+    public Flight getFlight(String flightNumber) {
+        return flights.get(flightNumber);
+    }
+}
+
+
+class ReservationSystem {
+    private FlightSchedule flightSchedule;
+
+    public ReservationSystem() {
+        this.flightSchedule = new FlightSchedule();
+    }
+
+    // Book a ticket and return the Booking object
+    public Booking bookTicket(String flightNumber, int seatNumber, Passenger passenger) {
+        Flight flight = flightSchedule.getFlight(flightNumber);
+        if (flight != null) {
+            return flight.bookSeat(seatNumber, passenger);  // Return the booking object
+        }
+        return null;  // Return null if flight not found
+    }
+
+    public void cancelTicket(String flightNumber, int seatNumber) {
+        Flight flight = flightSchedule.getFlight(flightNumber);
+        if (flight != null) {
+            flight.cancelSeat(seatNumber);
+        }
+    }
+}
+
+
+
+class Booking {
+    private Flight flight;
+    private Seat seat;
+    private Passenger passenger;
+    private Date bookingTime;
+    private boolean isConfirmed;
+
+    public Booking(Flight flight, Seat seat, Passenger passenger) {
+        this.flight = flight;
+        this.seat = seat;
+        this.passenger = passenger;
+        this.bookingTime = new Date(); // Booking time is set to current time
+        this.isConfirmed = false; // Booking initially unconfirmed
+    }
+
+    public Flight getFlight() {
+        return flight;
+    }
+
+    public Seat getSeat() {
+        return seat;
+    }
+
+    public Passenger getPassenger() {
+        return passenger;
+    }
+
+    public Date getBookingTime() {
+        return bookingTime;
+    }
+
+    public boolean isConfirmed() {
+        return isConfirmed;
+    }
+
+    public void confirmBooking() {
+        this.isConfirmed = true;
+    }
+
+    public void cancelBooking() {
+        this.isConfirmed = false;
+        seat.releaseSeat();  // Release the seat when booking is canceled
+    }
+}
