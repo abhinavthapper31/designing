@@ -1,0 +1,225 @@
+class User {
+    private String id;
+    private String name;
+    public User(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+}
+
+
+abstract class Split {
+    protected User user; // split for that user
+    protected double amount; // split amount for that user
+
+    public Split(User user, double amount) {
+        this.user = user;
+        this.amount = amount;
+    }
+    public double getAmount() { return amount; }
+}
+
+// split equally
+class EqualSplit extends Split {
+    public EqualSplit(User user) {
+        super(user, 0.0); // Amount will be set later
+    }
+}
+
+class ExactAmountSplit extends Split {
+    public ExactSplit(User user, double amount) {
+        // for exact split amounts we take input from the user only
+        super(user, amount);
+    }
+}
+
+class PercentageSplit extends Split {
+    private double percentage;
+
+    public PercentageSplit(User user, double percentage) {
+        super(user, 0.0); // Amount will be calculated later
+        this.percentage = percentage;
+    }
+
+    public double getPercentage() { return percentage; }
+}
+
+enum ExpenseType { EQUAL, EXACT, PERCENTAGE }
+
+class Expense {
+    private String id;
+    private double amount;
+    private User paidBy;
+    private Group group;
+    private List<Split> splits;
+    private ExpenseType expenseType;
+
+    public Expense(String id, double amount, User paidBy, List<Split> splits, ExpenseType type) {
+        this.id = id;
+        this.amount = amount;
+        this.paidBy = paidBy;
+        this.splits = splits;
+        this.expenseType = type;
+    }
+
+    // move to the ExpenseManager class
+    private void calculateSplits(BalanceTracker balanceTracker) {
+            if (expenseType == ExpenseType.EQUAL) {
+                double splitAmount = amount / splits.size();
+                for (Split split : splits) {
+                    ((EqualSplit) split).setAmount(splitAmount);
+                    if (split.getUser() != paidBy) {
+                        // split.getUser() -> debtor, paidBy -> creditor
+                        balanceTracker.updateBalance(split.getUser(), paidBy, split.getAmount());
+                    }
+                }
+            }
+            else if (expenseType == ExpenseType.PERCENTAGE) {
+                for (Split split : splits) {
+                    PercentageSplit percentageSplit = (PercentageSplit) split;
+                    double calculatedAmount = (percentageSplit.getPercentage() / 100) * amount;
+                    percentageSplit.setAmount(calculatedAmount);
+                        if (split.getUser() != paidBy) {
+                            // split.getUser() -> debtor, paidBy -> creditor
+                            balanceTracker.updateBalance(split.getUser(), paidBy, split.getAmount());
+                        }
+                }
+            } else if(expenseType == ExpenseType.EXACT){
+                for (Split split : splits) {
+                    ExactAmountSplit exactAmountSplit = (ExactAmountSplit) split;
+                    double calculatedAmount = exactAmountSplit.getAmount();
+                        if (split.getUser() != paidBy) {
+                            // split.getUser() -> debtor, paidBy -> creditor
+                            balanceTracker.updateBalance(split.getUser(), paidBy, calculatedAmount);
+                        }
+                }
+            }
+
+        }
+
+    // all expenses added need to be validated.
+    public boolean validate() {
+        double totalSplit = 0;
+        switch (expenseType) {
+            case EQUAL:
+                for (Split split : splits) {
+                    if (!(split instanceof EqualSplit)) {
+                        return false; // like invalid input
+                    }
+                    totalSplit += split.getAmount();
+                }
+                return Math.abs(totalSplit - amount) < 0.01;
+
+            case EXACT:
+                for (Split split : splits) {
+                    if (!(split instanceof ExactSplit)) {
+                        return false;
+                    }
+                    totalSplit += split.getAmount();
+                }
+                return totalSplit == amount;
+
+            case PERCENTAGE:
+                double totalPercentage = 0;
+                for (Split split : splits) {
+                    if (!(split instanceof PercentageSplit)) {
+                        return false;
+                    }
+                    totalPercentage += ((PercentageSplit) split).getPercentage();
+                    totalSplit += split.getAmount();
+                }
+                return totalPercentage == 100 && totalSplit == amount;
+            default:
+                return false;
+        }
+    }
+}
+
+class Group {
+    private String id;
+    private String name;
+    private List<User> members;
+    private List<Expense> expenses;
+    private BalanceTracker balanceTracker;
+
+    // Expense manager to validate and calculate splits
+    public Group(String id, String name) {
+        this.balanceTracker = new BalanceTracker();
+        this.balanceTracker.initializeBalances(this.members);
+    }
+
+    public void addMember(User user) {
+        members.add(user);
+    }
+
+    public void addExpense(Expense expense) {
+        if (expense.validate()) {
+            expenses.add(expense);
+            expense.calculateSplits(balanceTracker);
+        } else {
+            System.out.println("Invalid Expense");
+        }
+    }
+}
+
+
+class BalanceTracker {
+    // this should be on a group level
+    private Map<User, Map<User, Double>> owesMap = new HashMap<>();  // How much a user owes others.
+    private Map<User, Map<User, Double>> owedByMap = new HashMap<>(); // How much a user is owed by others.
+
+    public void initializeBalances(List<User> users) {
+        for (User user : users) {
+            owesMap.put(user, new HashMap<>());
+            owedByMap.put(user, new HashMap<>());
+        }
+    }
+    public void updateBalance(User debtor, User creditor, double amount) {
+        // Update owes map (debtor -> creditor)
+        owesMap.get(debtor).put(creditor, owesMap.get(debtor).getOrDefault(creditor, 0.0) + amount);
+
+        // Update owedBy map (creditor -> debtor)
+        owedByMap.get(creditor).put(debtor, owedByMap.get(creditor).getOrDefault(debtor, 0.0) + amount);
+    }
+
+    // Show balance summary of debts between users (who owes whom)
+    public void showBalances() {
+        for (Map.Entry<User, Map<User, Double>> entry : owesMap.entrySet()) {
+            User debtor = entry.getKey();
+            Map<User, Double> creditors = entry.getValue();
+
+            for (Map.Entry<User, Double> creditorEntry : creditors.entrySet()) {
+                User creditor = creditorEntry.getKey();
+                double amount = creditorEntry.getValue();
+                if (amount > 0) {
+                    System.out.println(debtor.getName() + " owes " + creditor.getName() + " " + amount);
+                }
+            }
+        }
+    }
+
+    // Show how much a user is owed by others (creditor perspective)
+    public void showCreditors() {
+        for (Map.Entry<User, Map<User, Double>> entry : owedByMap.entrySet()) {
+            User creditor = entry.getKey();
+            Map<User, Double> debtors = entry.getValue();
+
+            for (Map.Entry<User, Double> debtorEntry : debtors.entrySet()) {
+                User debtor = debtorEntry.getKey();
+                double amount = debtorEntry.getValue();
+                if (amount > 0) {
+                    System.out.println(creditor.getName() + " is owed " + amount + " by " + debtor.getName());
+                }
+            }
+        }
+    }
+
+    // Get the balances maps (for further processing if needed)
+    public Map<User, Map<User, Double>> getOwesMap() {
+        return owesMap;
+    }
+
+    public Map<User, Map<User, Double>> getOwedByMap() {
+        return owedByMap;
+    }
+}

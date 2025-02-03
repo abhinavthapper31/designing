@@ -1,0 +1,253 @@
+import java.util.ArrayList;
+import java.util.List;
+
+// Enum Definitions
+public enum Direction {
+    UP, DOWN, IDLE;
+}
+
+public enum ElevatorNumber {
+    ELEVATOR_NUMBER1, ELEVATOR_NUMBER2, ELEVATOR_NUMBER3, ELEVATOR_NUMBER4;
+}
+
+public enum DoorAction {
+    OPEN, CLOSE;
+}
+
+public enum FloorNumber {
+    FLOOR_1, FLOOR_2, FLOOR_3, FLOOR_4, FLOOR_5, FLOOR_6, FLOOR_7, FLOOR_8, FLOOR_9, FLOOR_10, FLOOR_11, FLOOR_12, FLOOR_13, FLOOR_14;
+}
+
+// Strategy Pattern for Floor Selection
+interface FloorSelectionStrategy {
+    void selectFloor(Elevator elevator);
+}
+
+class InternalFloorSelectionStrategy implements FloorSelectionStrategy {
+    private final FloorNumber floorNumber;
+
+    public InternalFloorSelectionStrategy(FloorNumber floorNumber) {
+        this.floorNumber = floorNumber;
+    }
+
+    @Override
+    public void selectFloor(Elevator elevator) {
+        elevator.goToFloor(floorNumber);
+    }
+}
+
+class ExternalFloorSelectionStrategy implements FloorSelectionStrategy {
+    private final Direction direction;
+
+    public ExternalFloorSelectionStrategy(Direction direction) {
+        this.direction = direction;
+    }
+
+    @Override
+    public void selectFloor(Elevator elevator) {
+        // Handle external floor selection logic (up/down)
+        if (direction == Direction.UP) {
+            elevator.move(Direction.UP);
+        } else if (direction == Direction.DOWN) {
+            elevator.move(Direction.DOWN);
+        }
+    }
+}
+
+// Elevator Components
+class Display {
+    private FloorNumber floorNumber;
+    private Direction direction;
+
+    public Display(FloorNumber floorNumber, Direction direction) {
+        this.floorNumber = floorNumber;
+        this.direction = direction;
+    }
+
+    public void updateDisplay(FloorNumber floorNumber, Direction direction) {
+        this.floorNumber = floorNumber;
+        this.direction = direction;
+        System.out.println("Display updated: Floor - " + floorNumber + ", Direction - " + direction);
+    }
+}
+
+class Door {
+    private DoorAction doorAction;
+
+    public Door(DoorAction doorAction) {
+        this.doorAction = doorAction;
+    }
+
+    public void openDoor() {
+        doorAction = DoorAction.OPEN;
+    }
+
+    public void closeDoor() {
+        doorAction = DoorAction.CLOSE;
+    }
+}
+
+abstract class Button {
+    public abstract boolean isPressed();
+    public abstract boolean press();
+}
+
+class ElevatorButton extends Button {
+    private boolean status;
+    private FloorNumber floorNumber;
+
+    public ElevatorButton(boolean status, FloorNumber floorNumber) {
+        this.status = status;
+        this.floorNumber = floorNumber;
+    }
+
+    @Override
+    public boolean isPressed() {
+        return status;
+    }
+
+    @Override
+    public boolean press() {
+        status = !status;
+        return status;
+    }
+
+    public FloorNumber getFloorNumber() {
+        return floorNumber;
+    }
+}
+
+// Elevator class
+public class Elevator {
+    private ElevatorNumber elevatorNumber;
+    private Door door;
+    private InsidePanel insidePanel;
+    private Display display;
+    private FloorNumber currentFloorNumber;
+    private Direction currentDirection;
+    private List<String> elevatorCommands;  // This will store the commands (actions)
+    private FloorSelectionStrategy floorSelectionStrategy;
+
+    public Elevator(ElevatorNumber elevatorNumber, Door door, InsidePanel insidePanel, Display display,
+                    FloorNumber currentFloorNumber, Direction currentDirection, FloorSelectionStrategy floorSelectionStrategy) {
+        this.elevatorNumber = elevatorNumber;
+        this.door = door;
+        this.insidePanel = insidePanel;
+        this.display = display;
+        this.currentFloorNumber = currentFloorNumber;
+        this.currentDirection = currentDirection;
+        this.floorSelectionStrategy = floorSelectionStrategy;
+        this.elevatorCommands = new ArrayList<>();
+    }
+
+    public void move(Direction direction) {
+        currentDirection = direction;
+        if (direction == Direction.UP) {
+            System.out.println("Elevator is moving up.");
+        } else if (direction == Direction.DOWN) {
+            System.out.println("Elevator is moving down.");
+        } else {
+            System.out.println("Elevator is idle.");
+        }
+    }
+
+    public void openDoor() {
+        door.openDoor();
+        System.out.println("Elevator door opened.");
+    }
+
+    public void closeDoor() {
+        door.closeDoor();
+        System.out.println("Elevator door closed.");
+    }
+
+    public void goToFloor(FloorNumber floorNumber) {
+        currentFloorNumber = floorNumber;
+        display.updateDisplay(floorNumber, currentDirection);
+        System.out.println("Elevator is on floor " + floorNumber);
+    }
+
+    public void addCommand(String command) {
+        elevatorCommands.add(command);
+    }
+
+    public void executeCommands() {
+        // Process all commands
+        for (String command : elevatorCommands) {
+            System.out.println("Executing command: " + command);
+        }
+        elevatorCommands.clear();
+    }
+
+    public void setFloorSelectionStrategy(FloorSelectionStrategy strategy) {
+        this.floorSelectionStrategy = strategy;
+    }
+
+    public void handleCommand() {
+        floorSelectionStrategy.selectFloor(this);
+    }
+}
+
+// InsidePanel class (Buttons for the inside of the elevator)
+public class InsidePanel {
+    private List<ElevatorButton> elevatorButtonList;
+
+    public InsidePanel() {
+        elevatorButtonList = new ArrayList<>();
+        for (int i = 0; i < 14; i++) {
+            elevatorButtonList.add(new ElevatorButton(false, FloorNumber.values()[i]));
+        }
+    }
+
+    public boolean pressFloorButton(int floorNumber) {
+        return elevatorButtonList.get(floorNumber).press();
+    }
+}
+
+// ElevatorSystem class to manage the flow of the elevator system
+public class ElevatorSystem {
+    private List<Elevator> elevators;
+
+    public ElevatorSystem() {
+        elevators = new ArrayList<>();
+        initializeElevators();
+    }
+
+    private void initializeElevators() {
+        for (ElevatorNumber number : ElevatorNumber.values()) {
+            Elevator elevator = new Elevator(number, new Door(DoorAction.CLOSE), new InsidePanel(),
+                    new Display(FloorNumber.FLOOR_1, Direction.IDLE), FloorNumber.FLOOR_1, Direction.IDLE, 
+                    new InternalFloorSelectionStrategy(FloorNumber.FLOOR_1)); // Default strategy
+            elevators.add(elevator);
+        }
+    }
+
+    public void callElevatorFromFloor(int floorNumber, Direction direction) {
+        System.out.println("Calling elevator from floor " + floorNumber);
+        Elevator elevator = elevators.get(0); // Assuming the first elevator responds
+        elevator.setFloorSelectionStrategy(new ExternalFloorSelectionStrategy(direction));
+
+        // Add action based on the direction
+        if (direction == Direction.UP) {
+            elevator.addCommand("Move Up");
+        } else if (direction == Direction.DOWN) {
+            elevator.addCommand("Move Down");
+        }
+
+        elevator.executeCommands();
+        elevator.openDoor();
+        elevator.closeDoor();
+    }
+}
+
+class Main {
+    public static void main(String[] args) {
+        ElevatorSystem elevatorSystem = new ElevatorSystem();
+
+        // Call elevator from floor 2, moving UP
+        elevatorSystem.callElevatorFromFloor(2, Direction.UP);
+
+        // Call elevator from floor 5, moving DOWN
+        elevatorSystem.callElevatorFromFloor(5, Direction.DOWN);
+    }
+}

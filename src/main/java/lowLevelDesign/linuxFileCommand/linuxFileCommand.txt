@@ -1,0 +1,141 @@
+public enum FileType {
+    FILE, DIRECTORY
+}
+
+public abstract class Command {
+    private String name;
+
+    public Command(String name) {
+        this.name = name;
+    }
+
+    abstract void executeCommand();
+}
+
+public class FindCommand extends Command {
+    private List<SearchCriteria> criteriaList;
+    private FileSearcher searcher;
+
+    public FindCommand(String name, List<SearchCriteria> criteriaList) {
+        super(name);
+        this.criteriaList = criteriaList;
+
+        // Assume we can get the source directory from criteria or arguments
+        Directory rootDirectory = new Directory("root/"); // Default directory for now
+        searcher = new FileSearcher(rootDirectory, criteriaList);
+    }
+
+    @Override
+    public void executeCommand() {
+        List<File> results = searcher.searchFiles();
+        SearchResultPrinter.print(results);
+    }
+}
+
+public class SearchCriteria {
+    private String name;
+    private FileType type;
+
+    // Constructors, getters, setters
+
+    public boolean matches(File file) {
+        boolean nameMatches = (name == null || file.getName().equals(name));
+        boolean typeMatches = (type == null || file.getType() == type);
+        return nameMatches && typeMatches;
+    }
+}
+
+public class FileSearcher {
+    private Directory rootDirectory;
+    private List<SearchCriteria> criteriaList;
+
+    public FileSearcher(Directory rootDirectory, List<SearchCriteria> criteriaList) {
+        this.rootDirectory = rootDirectory;
+        this.criteriaList = criteriaList;
+    }
+
+    public List<File> searchFiles() {
+        List<File> result = new ArrayList<>();
+        searchDirectory(rootDirectory, result);
+        return result;
+    }
+
+    private void searchDirectory(Directory directory, List<File> result) {
+        for (File file : directory.getFiles()) {
+            if (matchesAllCriteria(file)) {
+                result.add(file);
+            }
+            if (file instanceof Directory) {
+                searchDirectory((Directory) file, result); // Recursively search subdirectories
+            }
+        }
+    }
+
+    private boolean matchesAllCriteria(File file) {
+        for (SearchCriteria criteria : criteriaList) {
+            if (!criteria.matches(file)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+public abstract class FileSystem {
+    private String name;
+    private FileType type;
+
+    public FileSystem(String name, FileType type) {
+        this.name = name;
+        this.type = type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public FileType getType() {
+        return type;
+    }
+}
+
+public class Directory extends FileSystem {
+    private List<File> files;
+
+    public Directory(String name) {
+        super(name, FileType.DIRECTORY);
+        this.files = new ArrayList<>();
+    }
+
+    public List<File> getFiles() {
+        return files;
+    }
+
+    public void addFile(File file) {
+        this.files.add(file);
+    }
+}
+
+public class File extends FileSystem {
+    public File(String name) {
+        super(name, FileType.FILE);
+    }
+}
+
+public class SearchResultPrinter {
+    public static void print(List<File> results) {
+        if (results.isEmpty()) {
+            System.out.println("No matching files found.");
+        } else {
+            for (File file : results) {
+                System.out.println(file.getName()); // You can enhance this as needed
+            }
+        }
+    }
+}
+
+public class UNIXCommandExecutor {
+    public void executeCommand(Command command) {
+        command.executeCommand();
+    }
+}
