@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class MyHashMap<K, V> {
 
-    private static final int INITIAL_SIZE = 1 << 4;
+    private static final int INITIAL_SIZE = 16;
     Node<K, V>[] hashTable;
 
     MyHashMap() {
@@ -109,6 +109,8 @@ public class MyHashMap<K, V> {
         }
         return null;
     }
+
+    // TODO ADD IMPLEMENTATION FOR TREEIFY
 
     @Override
     public String toString() {

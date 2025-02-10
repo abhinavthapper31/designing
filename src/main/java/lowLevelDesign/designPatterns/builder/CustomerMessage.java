@@ -6,16 +6,12 @@ public class CustomerMessage {
     private String lastName;
     private String phoneNumber;
     private String email;
-    private boolean smsOpted;
-    private boolean emailOpted;
 
     private CustomerMessage(CustomerMessageBuilder builder) {
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
         this.phoneNumber = builder.phoneNumber;
         this.email = builder.email;
-        this.smsOpted = builder.smsOpted;
-        this.emailOpted = builder.emailOpted;
     }
 
     public static class CustomerMessageBuilder {
@@ -24,9 +20,6 @@ public class CustomerMessage {
         private String lastName;
         private String phoneNumber;
         private String email;
-        private boolean smsOpted;
-        private boolean emailOpted;
-
 
         CustomerMessageBuilder firstName(String firstName) {
             this.firstName = firstName;
@@ -48,16 +41,6 @@ public class CustomerMessage {
             return this;
         }
 
-        CustomerMessageBuilder smsOpted(boolean smsOpted) {
-            this.smsOpted = smsOpted;
-            return this;
-        }
-
-        CustomerMessageBuilder emailOpted(boolean emailOpted) {
-            this.emailOpted = emailOpted;
-            return this;
-        }
-
         CustomerMessage build() {
             return new CustomerMessage(this);
         }
@@ -70,8 +53,6 @@ public class CustomerMessage {
                 ", lastName='" + lastName + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", email='" + email + '\'' +
-                ", smsOpted=" + smsOpted +
-                ", emailOpted=" + emailOpted +
                 '}';
     }
 }

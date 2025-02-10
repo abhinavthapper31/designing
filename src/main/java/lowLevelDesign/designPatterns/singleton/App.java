@@ -12,6 +12,8 @@ import java.util.concurrent.Executors;
 public class App {
 
     public static void main(String[] args) {
+
+        // this is some work
         Runnable task = () -> {
             SyncSingleton singleton = SyncSingleton.getInstance();
             System.out.println(Thread.currentThread().getName() + ": " + singleton);

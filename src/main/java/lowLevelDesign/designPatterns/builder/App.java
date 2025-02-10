@@ -13,7 +13,6 @@ public class App {
     public static void main(String[] args) {
 
         CustomerMessage.CustomerMessageBuilder builder = new CustomerMessage.CustomerMessageBuilder();
-        builder.emailOpted(true);
         builder.firstName("Thapper");
         builder.lastName("Abhinav");
 

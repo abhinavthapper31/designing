@@ -4,7 +4,7 @@ public class Inventory {
 
     Shelf[] inventory;
 
-    Inventory(int itemCount) {
+    public Inventory(int itemCount) {
         inventory = new Shelf[itemCount];
         initialEmptyInventory();
     }

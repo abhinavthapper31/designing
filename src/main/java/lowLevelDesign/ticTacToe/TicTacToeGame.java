@@ -7,7 +7,7 @@ import java.util.*;
 
 public class TicTacToeGame {
 
-    Deque<Player> players;
+    Deque<Player> players; // turn based
     Board board;
 
     TicTacToeGame() {

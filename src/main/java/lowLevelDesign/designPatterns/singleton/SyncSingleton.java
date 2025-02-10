@@ -4,7 +4,7 @@ public class SyncSingleton {
 	// the attribute is the only instance which will be created
 	// volatile so as objects read directly from memory, all
 	// threads see same view of instance
-	private static volatile SyncSingleton singletonInstance;
+	private static SyncSingleton singletonInstance;
 
 	// private default constructor, prevents normal instantiation 
 	private SyncSingleton() {
@@ -14,7 +14,7 @@ public class SyncSingleton {
 	public static SyncSingleton getInstance() {
 		if (singletonInstance == null) {
 			// We do not make the whole function synchronized as  we need to make
-			// one the below code synchronized "singletonInstance = new SyncSingleton();"
+			// one the below code synchronized "singletonInstance = new SyncSingleton();" only
 			// we prevent blocking of other threads
 
 			synchronized(SyncSingleton.class) {
