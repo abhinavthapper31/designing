@@ -19,8 +19,7 @@ public class SnakeAndLadder {
 
     public void play() {
         boolean player1Turn = true;
-        while (player1.getPosition() < board.getWinningPosition() &&
-                player2.getPosition() < board.getWinningPosition()) {
+        while (true) {
 
             Player currentPlayer = player1Turn ? player1 : player2;
             System.out.println("\n" + currentPlayer.getName() + "'s turn. Press Enter to roll the dice.");

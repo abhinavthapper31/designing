@@ -7,5 +7,7 @@ public class SnakesAndLaddersApp {
         SnakeAndLadder game = new SnakeAndLadder();
         game.play();
 
+
+
     }
 }
